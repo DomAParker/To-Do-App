@@ -190,7 +190,7 @@ const removeCategory = (removeCatIndex) => {
     <li v-for="category in categories">
       {{ category }}
       <li v-for="task in todos">
-        <div v-if="category == task.taskCategory">
+        <div v-if="category == task.taskCategory" :class="task.taskStatus">
           Name: {{ task.taskName }} <br> 
           Status: {{ task.taskStatus }} <br>
           <button v-if="task.taskStatus == 'In Progress'" @click="completeTask(task.taskID)" :id=task.taskID>Complete</button>
@@ -223,4 +223,9 @@ li {
 .resetName:hover {
   opacity: 1;
 }
+
+.Complete {
+  color: rgb(87, 167, 87);
+}
+
 </style>
