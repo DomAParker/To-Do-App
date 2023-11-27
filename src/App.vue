@@ -69,7 +69,9 @@ watch(categories, newVal => {
 // Custom Functions--------------------------------------------------------------------------------
 
 const submitName = () => {
-  nameSubmitted.value = true;
+  if (name.value != "") {
+    nameSubmitted.value = true;
+  } 
 }
 
 const resetName = () => {
@@ -185,13 +187,18 @@ const removeCategory = (removeCatIndex) => {
 
 
     <!-- Task Display -->
-    <li v-for="task in todos">
-      Name: {{ task.taskName }} <br> 
-      Category: {{ task.taskCategory }} <br>
-      Status: {{ task.taskStatus }}
-      <button v-if="task.taskStatus == 'In Progress'" @click="completeTask(task.taskID)" :id=task.taskID>Complete</button>
-      <button v-if="task.taskStatus == 'Complete'" @click="reopenTask(task.taskID)" :id=task.taskID>Reopen</button>
-      <button @click="deleteTask(task.taskID)" :id=task.taskID>x</button>
+    <li v-for="category in categories">
+      {{ category }}
+      <li v-for="task in todos">
+        <div v-if="category == task.taskCategory">
+          Name: {{ task.taskName }} <br> 
+          Category: {{ task.taskCategory }} <br>
+          Status: {{ task.taskStatus }}
+          <button v-if="task.taskStatus == 'In Progress'" @click="completeTask(task.taskID)" :id=task.taskID>Complete</button>
+          <button v-if="task.taskStatus == 'Complete'" @click="reopenTask(task.taskID)" :id=task.taskID>Reopen</button>
+          <button @click="deleteTask(task.taskID)" :id=task.taskID>x</button>
+        </div>
+      </li>
     </li>
 
   </main>
