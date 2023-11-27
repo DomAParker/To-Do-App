@@ -192,11 +192,10 @@ const removeCategory = (removeCatIndex) => {
       <li v-for="task in todos">
         <div v-if="category == task.taskCategory">
           Name: {{ task.taskName }} <br> 
-          Category: {{ task.taskCategory }} <br>
-          Status: {{ task.taskStatus }}
+          Status: {{ task.taskStatus }} <br>
           <button v-if="task.taskStatus == 'In Progress'" @click="completeTask(task.taskID)" :id=task.taskID>Complete</button>
           <button v-if="task.taskStatus == 'Complete'" @click="reopenTask(task.taskID)" :id=task.taskID>Reopen</button>
-          <button @click="deleteTask(task.taskID)" :id=task.taskID>x</button>
+          <button @click="deleteTask(task.taskID)" :id=task.taskID>Delete</button>
         </div>
       </li>
     </li>
@@ -224,5 +223,4 @@ li {
 .resetName:hover {
   opacity: 1;
 }
-
 </style>
