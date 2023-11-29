@@ -188,7 +188,7 @@ const removeCategory = (removeCatIndex) => {
 
     <!-- Task Display -->
     <li v-for="category in categories">
-      {{ category }}
+      <div class="categoryTitle">{{ category }}</div>
       <li v-for="task in todos">
         <div v-if="category == task.taskCategory" :class="task.taskStatus">
           Name: {{ task.taskName }} <br> 
@@ -207,7 +207,7 @@ const removeCategory = (removeCatIndex) => {
 <style scoped>
 li {
   list-style-type: none;
-  padding: 5px;
+  padding-left: 5px;
 }
 
 .resetName {
@@ -228,4 +228,10 @@ li {
   color: rgb(87, 167, 87);
 }
 
+.categoryTitle {
+  padding: 10px;
+  padding-left: 5px;
+  padding-top: 20px;
+  font-weight: bold;
+}
 </style>
