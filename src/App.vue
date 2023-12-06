@@ -7,7 +7,12 @@ var todos = ref([{
   "taskID": '',
   "taskName": "",
   "taskCategory": "",
-  "taskStatus": ""
+  "taskStatus": "",
+  "subtaskList": {
+    "subtaskID" : "",
+    "subtaskName": "",
+    "subtaskStatus": ""
+  }
 }])
 const name = ref('')
 var categories = ref('')
@@ -19,6 +24,7 @@ var isCatOpen = ref(false)
 
 var input_task = ref('')
 var input_taskCat = ref(null)
+var input_subtask = ref('')
 
 const todos_desc = computed(() => todos.value.sort((a, b) => {
   return b.taskID - a.taskID
@@ -26,8 +32,12 @@ const todos_desc = computed(() => todos.value.sort((a, b) => {
 
 var i = ref()
 var tempTodos = ref([])
+var tempSubtasks = ref([])
 var nextTaskID = ref('')
+var nextSubtaskID = ref('')
 
+var numberInProgress = ref('')
+var currentTaskID = ref('')
 
 // Vue Functions (watch, onMounted)----------------------------------------------------------------
 
@@ -40,6 +50,7 @@ onMounted(() => {
   }
 
   nextTaskID.value = JSON.parse(localStorage.getItem('nextTaskID')) || 0
+  nextSubtaskID.value = JSON.parse(localStorage.getItem('nextSubtaskID')) || 0
   todos.value = JSON.parse(localStorage.getItem('todos')) || []
   categories.value = JSON.parse(localStorage.getItem('categories')) || (["Personal", "Work", "Coding"])
 
@@ -57,6 +68,10 @@ watch(todos, newVal => {
 
 watch(nextTaskID, newVal => {
   localStorage.setItem('nextTaskID', newVal)
+})
+
+watch(nextSubtaskID, newVal => {
+  localStorage.setItem('nextSubtaskID', newVal)
 })
 
 watch(categories, newVal => {
@@ -79,12 +94,13 @@ const resetName = () => {
 }
 
 const submitTask = () => {
-  if (input_task.value != "") {
+  if (input_task.value != "" && input_taskCat.value != null) {
     todos.value.push({
       taskID: nextTaskID.value,
       taskName: input_task.value,
       taskCategory: input_taskCat.value,
-      taskStatus: "In Progress"
+      taskStatus: "In Progress",
+      subtaskList: []
     })
     nextTaskID.value = nextTaskID.value + 1;
     input_task.value = ""
@@ -118,7 +134,6 @@ const openAddCat = () => {
 }
 
 const completeTask = (completeID) => {
-  tempTodos = JSON.parse(localStorage.getItem('todos'))
   for (let i = 0; i < todos._rawValue.length; i++) {
     if (completeID == todos.value[i].taskID) {
       todos.value[i].taskStatus = "Complete"
@@ -127,7 +142,6 @@ const completeTask = (completeID) => {
 }
 
 const reopenTask = (reopenID) => {
-  tempTodos = JSON.parse(localStorage.getItem('todos'))
   for (let i = 0; i < todos._rawValue.length; i++) {
     if (reopenID == todos.value[i].taskID) {
       todos.value[i].taskStatus = "In Progress"
@@ -138,13 +152,94 @@ const reopenTask = (reopenID) => {
 const removeCategory = (removeCatIndex) => {
   for (let i = 0; i < categories._rawValue.length; i++) {
     if (removeCatIndex == i) {
-      if (categories.value.length != 1) {
+      if (categories.value.length != 1) {ess
         categories.value.splice(i, 1)
     } else {
       categories.value = []
     }
   }
 }
+}
+
+const addSubtask = (taskID) => {
+  if (input_subtask.value != "") {
+    for (let i = 0; i < todos._rawValue.length; i++) {
+      if (taskID == todos.value[i].taskID) {
+        currentTaskID = i;
+        todos.value[i].subtaskList.push({
+          subtaskID: nextSubtaskID.value,
+          subtaskName: input_subtask,
+          subtaskStatus: "Pending Completion"
+        }
+        )
+      }
+    }
+    input_subtask = ""
+    nextSubtaskID.value = nextSubtaskID.value + 1
+    todos.value[currentTaskID].taskStatus = "In Progress"
+    console.log(input_subtask)
+  }
+}
+
+const deleteSubtask = (taskID, subtaskID) => {
+  for (let i = 0; i < todos._rawValue.length; i++) {
+    if (taskID == todos.value[i].taskID) {
+      tempSubtasks = todos.value[i].subtaskList
+      for (let j = 0; j < tempSubtasks.length; j++) {
+        if (subtaskID == tempSubtasks[j].subtaskID) {
+          tempSubtasks.splice(j, 1)
+          todos.value[i].subtaskList.value = tempSubtasks
+        }
+      }
+  }
+  }
+  checkSubtaskComplete(taskID, subtaskID)
+}
+
+const completeSubtask = (taskID, subtaskID) => {
+  for (let i = 0; i < todos._rawValue.length; i++) {
+    if (taskID == todos.value[i].taskID) {
+      for (let j = 0; j < todos.value[i].subtaskList.length; j++) {
+        if (subtaskID == todos.value[i].subtaskList[j].subtaskID) {
+          todos.value[i].subtaskList[j].subtaskStatus = "Complete"
+        }
+      }
+  }
+  }
+  checkSubtaskComplete(taskID, subtaskID)
+}
+
+const reopenSubtask = (taskID, subtaskID) => {
+  for (let i = 0; i < todos._rawValue.length; i++) {
+    if (taskID == todos.value[i].taskID) {
+      for (let j = 0; j < todos.value[i].subtaskList.length; j++) {
+        if (subtaskID == todos.value[i].subtaskList[j].subtaskID) {
+          todos.value[i].subtaskList[j].subtaskStatus = "In Progress"
+        }
+      }
+  }
+  }
+  checkSubtaskComplete(taskID, subtaskID)
+}
+
+const checkSubtaskComplete = (taskID) => {
+  numberInProgress = 0
+  for (let i = 0; i < todos._rawValue.length; i++) {
+    if (taskID == todos.value[i].taskID) {
+      currentTaskID = i
+      for (let j = 0; j < todos.value[i].subtaskList.length; j++) {
+        if (todos.value[i].subtaskList[j].subtaskStatus == "In Progress") {
+          numberInProgress = numberInProgress + 1;
+        } 
+      }
+  }
+  }
+  
+  if (numberInProgress == 0) {
+    todos._rawValue[currentTaskID].taskStatus = "Pending Completion"
+  } else {
+    todos._rawValue[currentTaskID].taskStatus = "In Progress"
+  }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -190,11 +285,22 @@ const removeCategory = (removeCatIndex) => {
       <div class="categoryTitle">{{ category }}</div>
       <li v-for="task in todos">
         <div class = "task.taskStatus" v-if="category == task.taskCategory" :class="task.taskStatus">
-          Name: {{ task.taskName }} <br> 
-          Status: {{ task.taskStatus }} <br>
-          <button class="completeButton" v-if="task.taskStatus == 'In Progress'" @click="completeTask(task.taskID)" :id=task.taskID>Complete</button>
+          Name: {{ task.taskName }} 
+          <button @click="deleteTask(task.taskID)" :id=task.taskID>Delete</button><br> 
+          Status: {{ task.taskStatus }} 
+          <button v-if="task.taskStatus == 'Pending Completion'" @click="completeTask(task.taskID)" :id=task.taskID>Complete</button><br>
+          Sub-tasks: 
+          <input v-model="input_subtask" type="text">
+          <button @click="addSubtask(task.taskID)" :id="task.taskID">Add</button>
+          <li class="subtaskList" v-for="(subtask, index) in task.subtaskList">
+            <div :class="subtask.subtaskStatus">
+              {{index + 1}}: {{ subtask.subtaskName }} - {{ subtask.subtaskStatus }}
+              <button v-if="subtask.subtaskStatus =='In Progress'" @click="completeSubtask(task.taskID, subtask.subtaskID)">Complete</button>
+              <button v-if="subtask.subtaskStatus =='Complete'" @click="reopenSubtask(task.taskID, subtask.subtaskID)">Reopen</button>
+              <button @click="deleteSubtask(task.taskID, subtask.subtaskID)">Delete</button>
+            </div>
+        </li> <br>
           <button v-if="task.taskStatus == 'Complete'" @click="reopenTask(task.taskID)" :id=task.taskID>Reopen</button>
-          <button @click="deleteTask(task.taskID)" :id=task.taskID>Delete</button>
         </div>
       </li>
     </li>
@@ -235,9 +341,5 @@ li {
 .task.taskStatus {
   background-color: black;
   padding: 4px;
-}
-
-.completeButton {
-  margin-bottom: 10px;
 }
 </style>
