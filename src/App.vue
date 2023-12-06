@@ -45,7 +45,6 @@ onMounted(() => {
 
   isCatOpen.value = false
 
-  console.log(categories)
 })
 
 watch(name, newVal => {
@@ -190,10 +189,10 @@ const removeCategory = (removeCatIndex) => {
     <li v-for="category in categories">
       <div class="categoryTitle">{{ category }}</div>
       <li v-for="task in todos">
-        <div v-if="category == task.taskCategory" :class="task.taskStatus">
+        <div class = "task.taskStatus" v-if="category == task.taskCategory" :class="task.taskStatus">
           Name: {{ task.taskName }} <br> 
           Status: {{ task.taskStatus }} <br>
-          <button v-if="task.taskStatus == 'In Progress'" @click="completeTask(task.taskID)" :id=task.taskID>Complete</button>
+          <button class="completeButton" v-if="task.taskStatus == 'In Progress'" @click="completeTask(task.taskID)" :id=task.taskID>Complete</button>
           <button v-if="task.taskStatus == 'Complete'" @click="reopenTask(task.taskID)" :id=task.taskID>Reopen</button>
           <button @click="deleteTask(task.taskID)" :id=task.taskID>Delete</button>
         </div>
@@ -229,9 +228,16 @@ li {
 }
 
 .categoryTitle {
-  padding: 10px;
-  padding-left: 5px;
   padding-top: 20px;
   font-weight: bold;
+}
+
+.task.taskStatus {
+  background-color: black;
+  padding: 4px;
+}
+
+.completeButton {
+  margin-bottom: 10px;
 }
 </style>
