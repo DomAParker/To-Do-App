@@ -99,7 +99,7 @@ const submitTask = () => {
       taskID: nextTaskID.value,
       taskName: input_task.value,
       taskCategory: input_taskCat.value,
-      taskStatus: "In Progress",
+      taskStatus: "Pending Completion",
       subtaskList: []
     })
     nextTaskID.value = nextTaskID.value + 1;
@@ -141,12 +141,13 @@ const completeTask = (completeID) => {
   }
 }
 
-const reopenTask = (reopenID) => {
+const reopenTask = (taskID) => {
   for (let i = 0; i < todos._rawValue.length; i++) {
-    if (reopenID == todos.value[i].taskID) {
+    if (taskID == todos.value[i].taskID) {
       todos.value[i].taskStatus = "In Progress"
   }
   }
+  checkSubtaskComplete(taskID)
 }
 
 const removeCategory = (removeCatIndex) => {
@@ -169,7 +170,7 @@ const addSubtask = (taskID) => {
         todos.value[i].subtaskList.push({
           subtaskID: nextSubtaskID.value,
           subtaskName: input_subtask,
-          subtaskStatus: "Pending Completion"
+          subtaskStatus: "In Progress"
         }
         )
       }
@@ -193,7 +194,7 @@ const deleteSubtask = (taskID, subtaskID) => {
       }
   }
   }
-  checkSubtaskComplete(taskID, subtaskID)
+  checkSubtaskComplete(taskID)
 }
 
 const completeSubtask = (taskID, subtaskID) => {
@@ -206,7 +207,7 @@ const completeSubtask = (taskID, subtaskID) => {
       }
   }
   }
-  checkSubtaskComplete(taskID, subtaskID)
+  checkSubtaskComplete(taskID)
 }
 
 const reopenSubtask = (taskID, subtaskID) => {
@@ -219,7 +220,7 @@ const reopenSubtask = (taskID, subtaskID) => {
       }
   }
   }
-  checkSubtaskComplete(taskID, subtaskID)
+  checkSubtaskComplete(taskID)
 }
 
 const checkSubtaskComplete = (taskID) => {
