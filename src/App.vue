@@ -57,7 +57,8 @@ onMounted(() => {
   categories.value = JSON.parse(localStorage.getItem('categories')) || (["Personal", "Work", "Coding"])
 
   isCatOpen.value = false
-
+  
+  input_subtask = ""
 })
 
 watch(name, newVal => {
@@ -305,7 +306,7 @@ const checkSubtaskComplete = (taskID) => {
       <li v-for="task in todos">
         <div class = "task.taskStatus" v-if="category == task.taskCategory" :class="task.taskStatus">
           Name: {{ task.taskName }} 
-          <button @click="deleteTask(task.taskID)" :id=task.taskID>Delete</button><br> 
+          <button @click="deleteTask(task.taskID)" :id=task.taskID>Delete</button><br>
           Status: {{ task.taskStatus }} 
           <button v-if="task.taskStatus == 'Pending Completion'" @click="completeTask(task.taskID)" :id=task.taskID>Complete</button>
           <button v-if="task.taskStatus == 'Complete'" @click="reopenTask(task.taskID)" :id=task.taskID>Reopen</button><br>
