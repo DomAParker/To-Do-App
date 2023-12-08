@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 
-// Setting Variable and Constants------------------------------------------------------------------
+// Setting Variables and Constants------------------------------------------------------------------
 
 var todos = ref([{
   "taskID": '',
@@ -26,10 +26,6 @@ var input_task = ref('')
 var input_taskCat = ref(null)
 var input_subtask = ref('')
 
-const todos_desc = computed(() => todos.value.sort((a, b) => {
-  return b.taskID - a.taskID
-}))
-
 var i = ref()
 var tempTodos = ref([])
 var tempSubtasks = ref([])
@@ -38,6 +34,12 @@ var nextSubtaskID = ref('')
 
 var numberInProgress = ref('')
 var currentTaskID = ref('')
+
+// Commenting this code in case needed in future (ordering of To Do tasks)
+//const todos_desc = computed(() => todos.value.sort((a, b) => {
+//  return b.taskID - a.taskID
+//}))
+
 
 // Vue Functions (watch, onMounted)----------------------------------------------------------------
 
@@ -82,6 +84,8 @@ watch(categories, newVal => {
 
 // Custom Functions--------------------------------------------------------------------------------
 
+// Functions for user's name at top of page
+
 const submitName = () => {
   if (name.value != "") {
     nameSubmitted.value = true;
@@ -93,6 +97,8 @@ const resetName = () => {
   name.value = "";
 }
 
+
+// Functions relating to tasks
 const submitTask = () => {
   if (input_task.value != "" && input_taskCat.value != null) {
     todos.value.push({
@@ -118,21 +124,6 @@ const deleteTask = (deleteID) => {
   }
 }
 
-const addCategory = () => {
-  if (new_category.value != "") {
-  categories.value.push(new_category.value)
-    new_category.value = ""
-}
-}
-
-const openAddCat = () => {
-  if (isCatOpen.value == true) {
-    isCatOpen.value = false
-} else {
-    isCatOpen.value = true
-}
-}
-
 const completeTask = (completeID) => {
   for (let i = 0; i < todos._rawValue.length; i++) {
     if (completeID == todos.value[i].taskID) {
@@ -150,6 +141,22 @@ const reopenTask = (taskID) => {
   checkSubtaskComplete(taskID)
 }
 
+// Functions relating to categories
+const addCategory = () => {
+  if (new_category.value != "") {
+  categories.value.push(new_category.value)
+    new_category.value = ""
+}
+}
+
+const openAddCat = () => {
+  if (isCatOpen.value == true) {
+    isCatOpen.value = false
+} else {
+    isCatOpen.value = true
+}
+}
+
 const removeCategory = (removeCatIndex) => {
   for (let i = 0; i < categories._rawValue.length; i++) {
     if (removeCatIndex == i) {
@@ -162,6 +169,8 @@ const removeCategory = (removeCatIndex) => {
 }
 }
 
+
+// Functions relating to subtasks
 const addSubtask = (taskID) => {
   if (input_subtask.value != "") {
     for (let i = 0; i < todos._rawValue.length; i++) {
@@ -258,9 +267,13 @@ const checkSubtaskComplete = (taskID) => {
     </section>
 
     <!-- Input section -->
-    <section class="taskInput">
+    <section class="inputSection">
+
+      <!-- Task Input -->
       <h1>Input a task</h1>
       <input type="text" v-model="input_task"><br>
+
+      <!-- Category Input -->
       <h3>Category</h3>
       <div v-if="isCatOpen == false">
         <button @click="openAddCat">Add Categories</button>
@@ -272,27 +285,36 @@ const checkSubtaskComplete = (taskID) => {
       </div>
       <span v-if="categoriesAmount == 0">You need to add some categories!</span>
       <br>
+      <!-- Display Categories-->
       <div v-for="(category, index) in categories">
         <input type="radio" :id="index" name="category" :value="category" v-model="input_taskCat">{{ category }}
         <button v-if="isCatOpen == true" @click="removeCategory(index)">Remove</button>
       </div><br>
+
+      <!-- Submit Task Button -->
       <button @click="submitTask">Submit</button>
     </section>
     <br>
 
 
     <!-- Task Display -->
+    <!-- Section for each category -->
     <li v-for="category in categories">
       <div class="categoryTitle">{{ category }}</div>
+      <!-- Each task within each category -->
       <li v-for="task in todos">
         <div class = "task.taskStatus" v-if="category == task.taskCategory" :class="task.taskStatus">
           Name: {{ task.taskName }} 
           <button @click="deleteTask(task.taskID)" :id=task.taskID>Delete</button><br> 
           Status: {{ task.taskStatus }} 
-          <button v-if="task.taskStatus == 'Pending Completion'" @click="completeTask(task.taskID)" :id=task.taskID>Complete</button><br>
+          <button v-if="task.taskStatus == 'Pending Completion'" @click="completeTask(task.taskID)" :id=task.taskID>Complete</button>
+          <button v-if="task.taskStatus == 'Complete'" @click="reopenTask(task.taskID)" :id=task.taskID>Reopen</button><br>
+          <!-- Each subtask within each task -->
           Sub-tasks: 
+          <!-- Subtask Input -->
           <input v-model="input_subtask" type="text">
           <button @click="addSubtask(task.taskID)" :id="task.taskID">Add</button>
+          <!-- Subtask List-->
           <li class="subtaskList" v-for="(subtask, index) in task.subtaskList">
             <div :class="subtask.subtaskStatus">
               {{index + 1}}: {{ subtask.subtaskName }} - {{ subtask.subtaskStatus }}
@@ -301,7 +323,6 @@ const checkSubtaskComplete = (taskID) => {
               <button @click="deleteSubtask(task.taskID, subtask.subtaskID)">Delete</button>
             </div>
         </li> <br>
-          <button v-if="task.taskStatus == 'Complete'" @click="reopenTask(task.taskID)" :id=task.taskID>Reopen</button>
         </div>
       </li>
     </li>
