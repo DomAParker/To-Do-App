@@ -161,7 +161,7 @@ const openAddCat = () => {
 const removeCategory = (removeCatIndex) => {
   for (let i = 0; i < categories._rawValue.length; i++) {
     if (removeCatIndex == i) {
-      if (categories.value.length != 1) {ess
+      if (categories.value.length != 1) {
         categories.value.splice(i, 1)
     } else {
       categories.value = []
