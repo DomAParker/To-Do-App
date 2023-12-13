@@ -184,7 +184,8 @@ const removeCategory = (removeCatIndex) => {
 
 // Functions relating to subtasks
 const addSubtask = (taskID) => {
-  if (input_subtask.value != "") {
+  console.log(input_subtask)
+  if (input_subtask != "") {
     for (let i = 0; i < todos._rawValue.length; i++) {
       if (taskID == todos.value[i].taskID) {
         currentTaskID = i;
@@ -199,7 +200,6 @@ const addSubtask = (taskID) => {
     input_subtask = ""
     nextSubtaskID.value = nextSubtaskID.value + 1
     todos.value[currentTaskID].taskStatus = "In Progress"
-    console.log(input_subtask)
   }
 }
 
@@ -262,6 +262,8 @@ const checkSubtaskComplete = (taskID) => {
   } else {
     todos._rawValue[currentTaskID].taskStatus = "In Progress"
   }
+
+  input_subtask = ""
 }
 
 //--------------------------------------------------------------------------------------------------
