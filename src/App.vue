@@ -22,7 +22,7 @@ var nameSubmitted = ref(false)
 
 var isCatOpen = ref(false)
 
-var input_task = ref('')
+var input_task = ref([])
 var input_taskCat = ref(null)
 var input_subtask = ref('')
 
@@ -33,6 +33,7 @@ var nextTaskID = ref('')
 var nextSubtaskID = ref('')
 
 var numberInProgress = ref('')
+var duplicateCheck = ref('')
 var currentTaskID = ref('')
 
 // Commenting this code in case needed in future (ordering of To Do tasks)
@@ -100,17 +101,17 @@ const resetName = () => {
 
 
 // Functions relating to tasks
-const submitTask = () => {
-  if (input_task.value != "" && input_taskCat.value != null) {
+const submitTask = (categoryID, index) => {
+  if (input_task.value != "") {
     todos.value.push({
       taskID: nextTaskID.value,
-      taskName: input_task.value,
-      taskCategory: input_taskCat.value,
+      taskName: input_task.value[index],
+      taskCategory: categoryID,
       taskStatus: "Pending Completion",
       subtaskList: []
     })
     nextTaskID.value = nextTaskID.value + 1;
-    input_task.value = ""
+    input_task.value = []
     input_taskCat.value = null
   }
 }
@@ -144,10 +145,20 @@ const reopenTask = (taskID) => {
 
 // Functions relating to categories
 const addCategory = () => {
-  if (new_category.value != "") {
-  categories.value.push(new_category.value)
-    new_category.value = ""
-}
+  duplicateCheck = 0
+  for (let i = 0; i < categories._rawValue.length; i++) {
+    if (new_category.value == categories.value[i]){
+      duplicateCheck = 1
+    }
+  }
+  if (duplicateCheck == 0) {
+    if (new_category.value != "") {
+    categories.value.push(new_category.value)
+      new_category.value = ""
+    }
+  } else {
+    alert("You already have this category!")
+  }
 }
 
 const openAddCat = () => {
@@ -269,11 +280,6 @@ const checkSubtaskComplete = (taskID) => {
 
     <!-- Input section -->
     <section class="inputSection">
-
-      <!-- Task Input -->
-      <h1>Input a task</h1>
-      <input type="text" v-model="input_task"><br>
-
       <!-- Category Input -->
       <h3>Category</h3>
       <div v-if="isCatOpen == false">
@@ -292,16 +298,17 @@ const checkSubtaskComplete = (taskID) => {
         <button v-if="isCatOpen == true" @click="removeCategory(index)">Remove</button>
       </div><br>
 
-      <!-- Submit Task Button -->
-      <button @click="submitTask">Submit</button>
     </section>
     <br>
 
 
     <!-- Task Display -->
     <!-- Section for each category -->
-    <li v-for="category in categories">
+    <li v-for="(category, index) in categories">
       <div class="categoryTitle">{{ category }}</div>
+      <!-- Task Input -->
+      <input type="text" v-model="input_task[index]">
+      <button @click="submitTask(category, index)">Submit</button>
       <!-- Each task within each category -->
       <li v-for="task in todos">
         <div class = "task.taskStatus" v-if="category == task.taskCategory" :class="task.taskStatus">
