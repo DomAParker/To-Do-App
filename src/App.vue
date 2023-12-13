@@ -24,7 +24,7 @@ var isCatOpen = ref(false)
 
 var input_task = ref([])
 var input_taskCat = ref(null)
-var input_subtask = ref('')
+var input_subtask = ref([])
 
 var i = ref()
 var tempTodos = ref([])
@@ -59,7 +59,7 @@ onMounted(() => {
 
   isCatOpen.value = false
   
-  input_subtask = ""
+  input_subtask = []
 })
 
 watch(name, newVal => {
@@ -116,19 +116,19 @@ const submitTask = (categoryID, index) => {
   }
 }
 
-const deleteTask = (deleteID) => {
+const deleteTask = (taskID) => {
   tempTodos = JSON.parse(localStorage.getItem('todos'))
   for (let i = 0; i < todos._rawValue.length; i++) {
-    if (deleteID == todos.value[i].taskID) {
+    if (taskID == todos.value[i].taskID) {
       tempTodos.splice(i, 1)
       todos.value = tempTodos
   }
   }
 }
 
-const completeTask = (completeID) => {
+const completeTask = (taskID) => {
   for (let i = 0; i < todos._rawValue.length; i++) {
-    if (completeID == todos.value[i].taskID) {
+    if (taskID == todos.value[i].taskID) {
       todos.value[i].taskStatus = "Complete"
   }
   }
@@ -183,21 +183,20 @@ const removeCategory = (removeCatIndex) => {
 
 
 // Functions relating to subtasks
-const addSubtask = (taskID) => {
-  console.log(input_subtask)
+const addSubtask = (taskID, index) => {
   if (input_subtask != "") {
     for (let i = 0; i < todos._rawValue.length; i++) {
       if (taskID == todos.value[i].taskID) {
         currentTaskID = i;
         todos.value[i].subtaskList.push({
           subtaskID: nextSubtaskID.value,
-          subtaskName: input_subtask,
+          subtaskName: input_subtask[index],
           subtaskStatus: "In Progress"
         }
         )
       }
     }
-    input_subtask = ""
+    input_subtask[index] = ""
     nextSubtaskID.value = nextSubtaskID.value + 1
     todos.value[currentTaskID].taskStatus = "In Progress"
   }
@@ -262,8 +261,6 @@ const checkSubtaskComplete = (taskID) => {
   } else {
     todos._rawValue[currentTaskID].taskStatus = "In Progress"
   }
-
-  input_subtask = ""
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -312,7 +309,7 @@ const checkSubtaskComplete = (taskID) => {
       <input type="text" v-model="input_task[index]">
       <button @click="submitTask(category, index)">Submit</button>
       <!-- Each task within each category -->
-      <li v-for="task in todos">
+      <li v-for="task, index) in todos">
         <div class = "task.taskStatus" v-if="category == task.taskCategory" :class="task.taskStatus">
           Name: {{ task.taskName }} 
           <button @click="deleteTask(task.taskID)" :id=task.taskID>Delete</button><br>
@@ -322,8 +319,8 @@ const checkSubtaskComplete = (taskID) => {
           <!-- Each subtask within each task -->
           Sub-tasks: 
           <!-- Subtask Input -->
-          <input v-model="input_subtask" type="text">
-          <button @click="addSubtask(task.taskID)" :id="task.taskID">Add</button>
+          <input v-model="input_subtask[index]" type="text">
+          <button @click="addSubtask(task.taskID, index)" :id="task.taskID">Add</button>
           <!-- Subtask List-->
           <li class="subtaskList" v-for="(subtask, index) in task.subtaskList">
             <div :class="subtask.subtaskStatus">
