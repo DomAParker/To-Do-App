@@ -306,6 +306,7 @@ const checkSubtaskComplete = (taskID) => {
     <li v-for="(category, index) in categories">
       <div class="categoryTitle">{{ category }}</div>
       <!-- Task Input -->
+      New Task: 
       <input type="text" v-model="input_task[index]">
       <button @click="submitTask(category, index)">Submit</button>
       <!-- Each task within each category -->
